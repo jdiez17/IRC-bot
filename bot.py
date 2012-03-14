@@ -4,26 +4,20 @@ import ConfigParser, os
 import socket
 import sys
 import time
-from multiprocessing import Process, Pipe
-from twisted.protocols import basic
-from twisted.internet import stdio, reactor
-from twisted.internet.protocol import ClientFactory
 
 
-class IRCBot(basic.LineReceiver):
+class IRCBot():
 	def __init__(self):
 		self.nick = ""
 		self.password = ""
 		self.home_channel = ""
 		
+		self.s = None
 		self.modules = []
 		self.config = None
 		
 		self.admins = []
 		self.transport = ""
-		
-		self.last_send = 0
-		self.send_threshold = 1
 
 		
 	def lineReceived(self, line):
@@ -31,29 +25,30 @@ class IRCBot(basic.LineReceiver):
 			print ">>> " + line
 			self.parse(line)
 			
-	def connectionMade(self):
-		self.transport.write("USER "+ self.nick +" "+ self.nick +" "+ self.nick +" :ariobot\n") 
-		self.transport.write("NICK "+ self.nick +"\r\n")
+	def connect(self, server, port):
+		self.s = socket.socket()
+		self.s.connect((server, port))
+		self.s.send("USER "+ self.nick +" "+ self.nick +" "+ self.nick +" :ariobot\n") 
+		self.s.send("NICK "+ self.nick +"\r\n")
 		
 		print "Loaded modules: "
 		for module in self.modules:
 			print "- " + module.modname
 		
+		time.sleep(2)
+		self.main_loop()
 	def __send_raw(self, cmd):
 		print "<<< " + cmd
 		try:
-			self.transport.write(cmd.encode("utf-8") + "\n")
+			self.s.send(cmd.encode("utf-8") + "\n")
 		except:
-			self.transport.write(cmd + "\n")
+			self.s.send(cmd + "\n")
 		
 	def __send(self, msg, override = False, channel_snd = "placeholder"):
-		if time.time() - self.last_send > self.send_threshold:
-			if channel_snd == "placeholder":
-				channel_snd = self.home_channel
-			
-			self.__send_raw("PRIVMSG " + channel_snd + " :" + msg)
-			
-			self.last_send = time.time()
+		if channel_snd == "placeholder":
+			channel_snd = self.home_channel
+		
+		self.__send_raw("PRIVMSG " + channel_snd + " :" + msg)
 		
 		
 	def send(self, msg):
@@ -141,31 +136,19 @@ class IRCBot(basic.LineReceiver):
 		module.set_config(self.config)
 		self.modules.append(module)
 		
-class IRCBotFactory(ClientFactory):
-	def __init__(self, config):
-		self.config = config
-		
-	def buildProtocol(self, addr):
-		bot = IRCBot()
-	
-		bot.set_config(config)
-		bot.load_module(Test())
-		bot.load_module(Useful())
-		bot.load_module(Toalla_R())
-		bot.load_module(Toalla())
-		bot.load_module(AdminCommands())
-		bot.load_module(Annoying())
-		bot.load_module(TwIRC())
-		bot.load_module(QDB2())
-		bot.load_module(AntiToalla())
-		bot.load_module(Texts())
-		
-		return bot
-		
-	def clientConnectionLost(self, connector, reason):
-		# connector.connect()
-		pass
-
+	def main_loop(self):
+		while 1:
+			try:				
+				lines = self.s.recv(4092)
+				lines = lines.split("\r\n")
+				for line in lines:
+					if line.strip(): # line is not empty
+						print ">>> " + line
+						self.lineReceived(line)
+						
+			except(KeyboardInterrupt, SystemExit):
+				self.__send_raw("QUIT :CTRL-c")
+				sys.exit()
 	
 if __name__ == '__main__':
 	from modules.test import Test
@@ -181,6 +164,19 @@ if __name__ == '__main__':
 	
 	config = ConfigParser.ConfigParser()
 	config.readfp(open('config.ini'))
-		
-	reactor.connectTCP(config.get('core', 'server'), int(config.get('core', 'port')), IRCBotFactory(config))
-	reactor.run()
+	
+	bot = IRCBot()
+	
+	bot.set_config(config)
+	bot.load_module(Test())
+	bot.load_module(Useful())
+	bot.load_module(Toalla_R())
+	bot.load_module(Toalla())
+	bot.load_module(AdminCommands())
+	bot.load_module(Annoying())
+	bot.load_module(TwIRC())
+	bot.load_module(QDB2())
+	bot.load_module(AntiToalla())
+	bot.load_module(Texts())
+	
+	bot.connect(config.get('core', 'server'), int(config.get('core', 'port')))
