@@ -140,6 +140,7 @@ class IRCBotFactory(ClientFactory):
 	
 		bot.set_config(config)
 		bot.load_module(Test())
+		bot.load_module(Useful())
 		bot.load_module(Toalla_R())
 		bot.load_module(Toalla())
 		bot.load_module(AdminCommands())
@@ -162,6 +163,7 @@ if __name__ == '__main__':
 	from modules.twirc import TwIRC
 	from modules.qdb import QDB2
 	from modules.antitoalla import AntiToalla
+	from modules.useful import Useful
 	
 	config = ConfigParser.ConfigParser()
 	config.readfp(open('config.ini'))
