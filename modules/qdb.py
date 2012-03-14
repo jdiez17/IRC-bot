@@ -27,7 +27,11 @@ class QDB2(Module):
 					if result['results']['success'] == 1:
 						quote = result['results']['data']['text'].split("\n")
 						for line in quote:
-							response.add_action(self.send_message(line))
+							if "\r" in line or "\n" in line:
+								for subline in line.split("\r\n")
+									response.add_action(self.send_message(subline))
+							else:
+								response.add_action(self.send_message(line))
 					else:
 						problem = {'hidden_quote': 'The quote is hidden.', 'no_such_quote': 'No such quote exists.'}[result['results']['error']]
 						response.add_action(self.send_message("Error: " + problem))
