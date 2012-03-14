@@ -12,9 +12,16 @@ class QDB2(Module):
 		self.qdb_api_post = "http://qdb.vortigaunt.net/api/send/%s"
 		self.qdb_login = "http://qdb.vortigaunt.net/login/%s"
 		self.qdb_api_read = "http://qdb.vortigaunt.net/api/read/%s"
-		self.qdb_secret = "[redacted]"
+		self.qdb_secret = ""
 		self.quote_users = {}
-	
+		self.initialized = False
+		
+	def initialize(self):
+		if self.initialized: return
+		
+		self.qdb_secret = self.config.get('qdb', 'password')
+		self.initialized = True
+		
 	def parse(self, msg, cmd, user, arg):
 		if cmd == ".read":
 			response = Response()

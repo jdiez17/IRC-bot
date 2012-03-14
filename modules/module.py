@@ -3,7 +3,7 @@ class Module():
 		self.modname = "unnamed_mod"
 		self.admins = []
 		self.nick = ""
-		self.parent = None
+		self.config = None
 		
 	def set_admins(self, admins):
 		self.admins = admins
@@ -11,9 +11,12 @@ class Module():
 	def set_nick(self, nick):
 		self.nick = nick
 		
-	def set_parent_reference(self, parent):
-		self.parent = parent
+	def set_config(self, config):
+		self.config = config
 		
+		if "initialize" in dir(self):
+			self.initialize()
+			
 	def __malfunction(self):
 		return {'accepted': -1, 'module': self.modname}
 		

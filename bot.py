@@ -1,5 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 
+import ConfigParser, os
 import socket
 import sys
 import time
@@ -16,8 +17,9 @@ class IRCBot(basic.LineReceiver):
 		self.home_channel = "#fearnode"
 		
 		self.modules = []
+		self.config = None
 		
-		self.admins = ['fortytwo_de', self.nick]
+		self.admins = []
 		self.transport = ""
 
 		
@@ -115,16 +117,28 @@ class IRCBot(basic.LineReceiver):
 				if resp_resp == True:
 					return True
 	
+	def set_config(self, config):
+		self.config = config
+		
+		self.nick = config.get('core', 'nick')
+		self.admins = [config.get('core', 'admin'), self.nick]
+		self.home_channel = config.get('core', 'home_channel')
+		self.password = config.get('core', 'password')
+	
 	def load_module(self, module):
 		module.set_admins(self.admins)
 		module.set_nick(self.nick)
-		module.set_parent_reference(self)
+		module.set_config(self.config)
 		self.modules.append(module)
 		
 class IRCBotFactory(ClientFactory):
+	def __init__(self, config):
+		self.config = config
+		
 	def buildProtocol(self, addr):
 		bot = IRCBot()
 	
+		bot.set_config(config)
 		bot.load_module(Test())
 		bot.load_module(Toalla_R())
 		bot.load_module(Toalla())
@@ -149,5 +163,8 @@ if __name__ == '__main__':
 	from modules.qdb import QDB2
 	from modules.antitoalla import AntiToalla
 	
-	reactor.connectTCP("irc.freenode.net", 6667, IRCBotFactory())
+	config = ConfigParser.ConfigParser()
+	config.readfp(open('config.ini'))
+		
+	reactor.connectTCP(config.get('core', 'server'), int(config.get('core', 'port')), IRCBotFactory(config))
 	reactor.run()

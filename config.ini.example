@@ -1,0 +1,9 @@
+[core]
+server = irc.freenode.net
+port = 6667
+nick = 
+password = 
+home_channel = 
+
+[qdb]
+password = taretizz
