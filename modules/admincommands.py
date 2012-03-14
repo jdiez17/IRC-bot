@@ -10,7 +10,7 @@ class AdminCommands(Module):
 			return self.reconnect()
 			
 		if "INVITE " + self.nick in line:
-			return self.send_raw_message("JOIN " + "#fearnode") # fix hardcode
+			return self.send_raw_message("JOIN " + self.config.get('core', 'home_channel'))
 		else:
 			return self.ignore()
 	

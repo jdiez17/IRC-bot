@@ -12,9 +12,9 @@ from twisted.internet.protocol import ClientFactory
 
 class IRCBot(basic.LineReceiver):
 	def __init__(self):
-		self.nick = "Natychan"
+		self.nick = ""
 		self.password = ""
-		self.home_channel = "#fearnode"
+		self.home_channel = ""
 		
 		self.modules = []
 		self.config = None
