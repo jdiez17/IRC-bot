@@ -28,7 +28,7 @@ class QDB2(Module):
 						quote = result['results']['data']['text'].split("\n")
 						for line in quote:
 							if "\r" in line or "\n" in line:
-								for subline in line.split("\r\n")
+								for subline in line.split("\r\n"):
 									response.add_action(self.send_message(subline))
 							else:
 								response.add_action(self.send_message(line))
