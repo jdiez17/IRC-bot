@@ -21,6 +21,9 @@ class IRCBot(basic.LineReceiver):
 		
 		self.admins = []
 		self.transport = ""
+		
+		self.last_send = 0
+		self.send_threshold = 1
 
 		
 	def lineReceived(self, line):
@@ -38,13 +41,20 @@ class IRCBot(basic.LineReceiver):
 		
 	def __send_raw(self, cmd):
 		print "<<< " + cmd
-		self.transport.write(cmd.encode("utf-8") + "\n")
+		try:
+			self.transport.write(cmd.encode("utf-8") + "\n")
+		except:
+			self.transport.write(cmd + "\n")
 		
 	def __send(self, msg, override = False, channel_snd = "placeholder"):
-		if channel_snd == "placeholder":
-			channel_snd = self.home_channel
+		if time.time() - self.last_send > self.send_threshold:
+			if channel_snd == "placeholder":
+				channel_snd = self.home_channel
 			
-		self.__send_raw("PRIVMSG " + channel_snd + " :" + msg)
+			self.__send_raw("PRIVMSG " + channel_snd + " :" + msg)
+			
+			self.last_send = time.time()
+		
 		
 	def send(self, msg):
 		return self.__send(msg)
@@ -155,6 +165,7 @@ class IRCBotFactory(ClientFactory):
 	def clientConnectionLost(self, connector, reason):
 		# connector.connect()
 		pass
+
 	
 if __name__ == '__main__':
 	from modules.test import Test
