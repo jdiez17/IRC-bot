@@ -7,3 +7,6 @@ home_channel =
 
 [qdb]
 password = 
+
+[texts]
+path = 

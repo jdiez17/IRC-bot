@@ -148,11 +148,13 @@ class IRCBotFactory(ClientFactory):
 		bot.load_module(TwIRC())
 		bot.load_module(QDB2())
 		bot.load_module(AntiToalla())
+		bot.load_module(Texts())
 		
 		return bot
 		
 	def clientConnectionLost(self, connector, reason):
-		connector.connect()
+		# connector.connect()
+		pass
 	
 if __name__ == '__main__':
 	from modules.test import Test
@@ -164,6 +166,7 @@ if __name__ == '__main__':
 	from modules.qdb import QDB2
 	from modules.antitoalla import AntiToalla
 	from modules.useful import Useful
+	from modules.texts import Texts
 	
 	config = ConfigParser.ConfigParser()
 	config.readfp(open('config.ini'))
