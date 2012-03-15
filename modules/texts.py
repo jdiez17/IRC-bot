@@ -14,7 +14,11 @@ class Texts(Module):
 			if "." in arg[0]:
 				return self.send_message("A hackear a tu casa.")
 			
-			file = open(self.path + arg[0]).readlines()
+			try:
+				file = open(self.path + arg[0]).readlines()
+			except:
+				return self.send_message("Ese texto no existe.")
+				
 			response = Response()
 			
 			for line in file:
