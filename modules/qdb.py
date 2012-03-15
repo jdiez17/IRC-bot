@@ -81,7 +81,10 @@ class QDB2(Module):
 			
 			payload = {'nick': user + ' (bot)', 'text': quote, 'comment': comment, 'hidden': private}
 			r = requests.post(self.qdb_api_post % password, data=payload)
-			r = json.loads(r.content)
+			try:
+				r = json.loads(r.content)
+			except:
+				return self.send_message('wodim, arregla el qdb.')
 			
 			self.quote_users[user] = []
 			return self.send_message(r['results']['url'] + " " + comment + " (" + user + ")")
