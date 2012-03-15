@@ -23,9 +23,7 @@ class IRCBot():
 		self.lock_ended = False
 		
 	def lineReceived(self, line):
-		if line.strip():
-			print ">>> " + line
-			self.parse(line)
+		self.parse(line)
 			
 	def connect(self, server, port):
 		self.s = socket.socket()
@@ -148,16 +146,21 @@ class IRCBot():
 		
 	def main_loop(self):
 		while 1:
-			try:				
+			try:
+				time1 = time.time()
 				lines = self.s.recv(4092)
-				lines = lines.split("\r\n")
-				for line in lines:
-					if line.strip(): # line is not empty
-						print ">>> " + line
-						if self.lock_ended:
+				time2 = time.time()
+				
+				if self.lock_ended and (time2 - time1 < 1):
+					if self.lock_ended:
 							self.lock_ended = False
 							self.locked = False
-						else:
+							print "III Ignoring '" + lines + "'"
+				else:
+					lines = lines.split("\r\n")
+					for line in lines:
+						if line.strip(): # line is not empty
+							print ">>> " + line
 							self.lineReceived(line)
 						
 			except(KeyboardInterrupt, SystemExit):
