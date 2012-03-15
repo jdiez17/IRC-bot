@@ -19,6 +19,7 @@ class IRCBot():
 		self.admins = []
 		self.transport = ""
 
+		self.locked = False
 		
 	def lineReceived(self, line):
 		if line.strip():
@@ -54,7 +55,7 @@ class IRCBot():
 	def send(self, msg):
 		return self.__send(msg)
 	
-	def __parse_response(self, response, module):				
+	def __parse_response(self, response, module, bypass_lock = False):				
 		print "III " + str(response)
 		if response == None:
 			print "!!! Malfunction -> " + str(module)
@@ -63,13 +64,19 @@ class IRCBot():
 		elif response['accepted'] == True:
 			if response.has_key('reconnect'):
 				self.transport.loseConnection()
+			if response.has_key('acquire_lock'):
+				self.locked = True
+			if response.has_key('release_lock'):
+				self.locked = False
 			if response.has_key('actions'):
 				for action in response['actions']:
-					self.__parse_response(action, response['module'])
+					self.__parse_response(action, response['module'], True)
 			if response.has_key('message'):
-				self.__send(response['message'])
+				if not self.locked or bypass_lock:
+					self.__send(response['message'])
 			if response.has_key('raw_message'):
-				self.__send_raw(response['raw_message'])
+				if not self.locked or bypass_lock:
+					self.__send_raw(response['raw_message'])
 			if response.has_key('recursion'):
 				if response['recursion'] == True:
 					self.user_cmd("", response['cmd'], response['user'], response['arg'])
