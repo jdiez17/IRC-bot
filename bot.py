@@ -81,6 +81,7 @@ class IRCBot():
 					self.__send_raw(response['raw_message'])
 				if response.has_key('recursion'):
 					if response['recursion'] == True:
+						time.sleep(0.5)
 						self.user_cmd("", response['cmd'], response['user'], response['arg'])
 				return True
 	
