@@ -66,7 +66,7 @@ class Module():
 		return self.generate_response(True, "", raw_msg, True, cmd, user, arg)
 		
 	def reconnect(self):
-		return {'reconnect': True}
+		return {'reconnect': True, 'accepted': True}
 	def ignore(self):
 		return self.generate_response(False)
 		

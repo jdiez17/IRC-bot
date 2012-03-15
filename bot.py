@@ -20,6 +20,7 @@ class IRCBot():
 		self.transport = ""
 
 		self.locked = False
+		self.lock_ended = False
 		
 	def lineReceived(self, line):
 		if line.strip():
@@ -51,7 +52,6 @@ class IRCBot():
 		
 		self.__send_raw("PRIVMSG " + channel_snd + " :" + msg)
 		
-		
 	def send(self, msg):
 		return self.__send(msg)
 	
@@ -62,25 +62,27 @@ class IRCBot():
 		elif response['accepted'] == -1:
 			print "!!! Malfunction (class 2) -> " + response['module']
 		elif response['accepted'] == True:
-			if response.has_key('reconnect'):
-				self.transport.loseConnection()
-			if response.has_key('acquire_lock'):
-				self.locked = True
-			if response.has_key('release_lock'):
-				self.locked = False
-			if response.has_key('actions'):
-				for action in response['actions']:
-					self.__parse_response(action, response['module'], True)
-			if response.has_key('message'):
-				if not self.locked or bypass_lock:
+			if not self.locked or bypass_lock:
+				if response.has_key('reconnect'):
+					self.transport.loseConnection()
+				if response.has_key('acquire_lock'):
+					self.locked = True
+					self.lock_ended = False
+					return
+				if response.has_key('release_lock'):
+					self.lock_ended = True
+					return
+				if response.has_key('actions'):
+					for action in response['actions']:
+						self.__parse_response(action, response['module'], True)
+				if response.has_key('message'):
 					self.__send(response['message'])
-			if response.has_key('raw_message'):
-				if not self.locked or bypass_lock:
+				if response.has_key('raw_message'):
 					self.__send_raw(response['raw_message'])
-			if response.has_key('recursion'):
-				if response['recursion'] == True:
-					self.user_cmd("", response['cmd'], response['user'], response['arg'])
-			return True
+				if response.has_key('recursion'):
+					if response['recursion'] == True:
+						self.user_cmd("", response['cmd'], response['user'], response['arg'])
+				return True
 	
 	def parse(self, line):
 		if "PING :" in line:
@@ -151,7 +153,11 @@ class IRCBot():
 				for line in lines:
 					if line.strip(): # line is not empty
 						print ">>> " + line
-						self.lineReceived(line)
+						if self.lock_ended:
+							self.lock_ended = False
+							self.locked = False
+						else:
+							self.lineReceived(line)
 						
 			except(KeyboardInterrupt, SystemExit):
 				self.__send_raw("QUIT :CTRL-c")
