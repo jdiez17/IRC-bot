@@ -25,8 +25,10 @@ class QDB2(Module):
 	def parse(self, msg, cmd, user, arg):
 		if cmd == ".read":
 			response = Response()
-			
-			result = requests.get(self.qdb_api_read % arg[0])
+			try:
+				result = requests.get(self.qdb_api_read % arg[0])
+			except:
+				return self.send_message("Tu puta madre.")
 			try:
 				result = json.loads(result.content)
 			
@@ -102,7 +104,10 @@ class QDB2(Module):
 				else:
 					send = False
 				
-				self.quote_users[user].append(msg)
+				try:
+					self.quote_users[user].append(msg.encode("utf-8"))
+				except:
+					self.quote_users[user].append(msg)
 				
 				if send:
 					return self.send_raw_message("PRIVMSG " + user + " :Escribe .send <comentario> cuando termines, .send_private <comentario> para enviar quote privado, o .cancel para cancelar.")

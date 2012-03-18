@@ -22,6 +22,14 @@ class IRCBot():
 		self.locked = False
 		self.lock_ended = False
 		
+	def log(self, line):
+		print line
+		
+		file = open(self.config.get('log', 'path'), 'a')
+		file.write("[" + str(time.time()) + "] " + line + "\n")
+		
+		file.close()
+		
 	def lineReceived(self, line):
 		self.parse(line)
 			
@@ -37,8 +45,9 @@ class IRCBot():
 		
 		time.sleep(2)
 		self.main_loop()
+		
 	def __send_raw(self, cmd):
-		print "<<< " + cmd
+		self.log("<<< " + cmd)
 		try:
 			self.s.send(cmd.encode("utf-8") + "\n")
 		except:
@@ -72,6 +81,7 @@ class IRCBot():
 					return
 				if response.has_key('actions'):
 					for action in response['actions']:
+						time.sleep(0.5)
 						self.__parse_response(action, response['module'], True)
 				if response.has_key('message'):
 					self.__send(response['message'])
@@ -160,13 +170,13 @@ class IRCBot():
 							lines = lines.split("\r\n")
 							for line in lines:
 								if line.strip(): # line is not empty
-									print ">>> " + line
+									self.log(">>> " + line)
 									self.lineReceived(line)
 				else:
 					lines = lines.split("\r\n")
 					for line in lines:
 						if line.strip(): # line is not empty
-							print ">>> " + line
+							self.log(">>> " + line)
 							self.lineReceived(line)
 						
 			except(KeyboardInterrupt, SystemExit):

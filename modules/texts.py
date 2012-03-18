@@ -1,5 +1,6 @@
 from module import Module
 from response.response import Response
+import os
 
 class Texts(Module):
 	def __init__(self):
@@ -10,9 +11,15 @@ class Texts(Module):
 		self.path = self.config.get('texts', 'path')
 		
 	def parse(self, msg, cmd, user, arg):
+		if cmd == ".ltext":
+			texts = os.listdir(self.path)
+			return self.send_message(', '.join(texts))
 		if cmd == ".text":
-			if "." in arg[0]:
-				return self.send_message("A hackear a tu casa.")
+			try:
+				if "." in arg[0]:
+					return self.send_message("A hackear a tu casa.")
+			except:
+				return self.send_message("Tu puta madre.")
 			
 			try:
 				file = open(self.path + arg[0]).readlines()
