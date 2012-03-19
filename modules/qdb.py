@@ -76,7 +76,11 @@ class QDB2(Module):
 				private = 0
 				
 			for line in self.quote_users[user]:
-				quote = quote + "\n" + line
+				try:
+					quote = quote + "\n" + unicode(line, "cp1252").encode("utf-8")
+				except:
+					return self.send_message("Pues va a ser que no.")
+					
 			
 			if quote == "":
 				return self.ignore()
