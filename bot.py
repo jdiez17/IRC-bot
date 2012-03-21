@@ -166,7 +166,7 @@ class IRCBot():
 						self.locked = False
 						print "III Ignoring '" + lines + "'"
 						
-						if  (time2 - time1 < 1):
+						if  (time2 - time1 < 1): # lol fix this crap
 							lines = lines.split("\r\n")
 							for line in lines:
 								if line.strip(): # line is not empty
