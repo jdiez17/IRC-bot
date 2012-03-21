@@ -96,7 +96,7 @@ class TwIRC(Module, tweepy.StreamListener):
 					#if time.time() - self.last_tweet_attempt < 5:
 					#	return self.generate_response(
 					
-					return self.send_message(self.status_link % str(res.id))
+					return self.send_message(' '.join(arg) + " " + self.status_link % str(res.id))
 				except:
 					return self.send_message("Algo se ha roto, hamigos.")
 			else:

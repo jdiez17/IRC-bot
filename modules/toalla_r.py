@@ -22,7 +22,7 @@ class Toalla_R(Module):
 			toa_list = [] 
 			
 			times = 1
-			nick = ' '.join(arg[1:])
+			nick = ' '.join(arg[1:]).strip()
 			
 			if nick[:1] == "@":
 				times = 1

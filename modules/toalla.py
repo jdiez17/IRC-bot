@@ -30,10 +30,10 @@ class Toalla(Module):
 				if times == 0:
 					return self.ignore()
 					
-				nick = ' '.join(arg[1:])
+				nick = ' '.join(arg[1:]).strip()
 			except:
 				times = 1
-				nick = ' '.join(arg[0:])
+				nick = ' '.join(arg[0:]).strip()
 
 			if nick[:1] == "@":
 				times = 1
