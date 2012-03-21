@@ -164,14 +164,15 @@ class IRCBot():
 				if self.lock_ended:
 						self.lock_ended = False
 						self.locked = False
-						print "III Ignoring '" + lines + "'"
 						
-						if  (time2 - time1 < 1): # lol fix this crap
+						if  (time2 - time1 > 1): # lol fix this crap
 							lines = lines.split("\r\n")
 							for line in lines:
 								if line.strip(): # line is not empty
 									self.log(">>> " + line)
 									self.lineReceived(line)
+						else:
+							print "III Ignoring '" + lines + "'"
 				else:
 					lines = lines.split("\r\n")
 					for line in lines:
