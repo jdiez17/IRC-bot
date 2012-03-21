@@ -24,7 +24,7 @@ class QDB2(Module):
 		if self.initialized: return
 		
 		self.qdb_secret = self.config.get('qdb', 'apikey')
-		self.qdb_secret = self.config.get('qdb', 'password')
+		self.qdb_password = self.config.get('qdb', 'password')
 		self.initialized = True
 		
 	def parse(self, msg, cmd, user, arg):
