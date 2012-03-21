@@ -4,9 +4,13 @@ port = 6667
 nick = 
 password = 
 home_channel = 
+admin = 
 
 [qdb]
-password = 
+apikey = 
+
+[log]
+path = 
 
 [texts]
 path = 
