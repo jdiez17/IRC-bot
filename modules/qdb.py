@@ -16,6 +16,7 @@ class QDB2(Module):
 		self.qdb_api_search = "http://qdb.vortigaunt.net/api/search/%s"
 		
 		self.qdb_secret = ""
+		self.qdb_password = ""
 		self.quote_users = {}
 		self.initialized = False
 		
@@ -23,6 +24,7 @@ class QDB2(Module):
 		if self.initialized: return
 		
 		self.qdb_secret = self.config.get('qdb', 'apikey')
+		self.qdb_secret = self.config.get('qdb', 'password')
 		self.initialized = True
 		
 	def parse(self, msg, cmd, user, arg):
@@ -83,7 +85,7 @@ class QDB2(Module):
 			return self.multiple_response(response.generate_response())
 		if cmd == ".password":
 			m = hashlib.md5()
-			m.update(date.today().strftime("%d/%m/%Y") + self.qdb_secret)
+			m.update(date.today().strftime("%d/%m/%Y") + self.qdb_password)
 			password = m.hexdigest()[:8]
 			
 			return self.send_message(self.qdb_login % password)
