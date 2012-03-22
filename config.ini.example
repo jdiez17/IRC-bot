@@ -8,9 +8,11 @@ admin =
 
 [qdb]
 apikey = 
+password = 
 
 [log]
 path = 
+rollover = midnight
 
 [texts]
 path = 
