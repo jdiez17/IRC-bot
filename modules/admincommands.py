@@ -1,5 +1,6 @@
 from module import Module
 import sys
+from subprocess import Popen, PIPE
 
 class AdminCommands(Module):
 	def __init__(self):
@@ -21,6 +22,15 @@ class AdminCommands(Module):
 		if cmd == ".rehash":
 			return self.reconnect()
 			
+		if cmd == ".gitupdate":
+			proc = Popen(['git', 'pull'], stdout=PIPE, stderr=PIPE)
+			code = proc.wait()
+			if code == 0:
+				proc_msg = proc.stdout.read()
+				if "Already up-to-date." in proc_msg:
+					return self.send_message("No updates found.")
+					
+				return self.send_message("Updated.")
 		if cmd == ".parrot":
 			msg = msg.replace(cmd + " ", "")
 			return self.send_message(msg)
