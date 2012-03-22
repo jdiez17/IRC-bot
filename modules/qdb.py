@@ -109,7 +109,12 @@ class QDB2(Module):
 				
 			for line in self.quote_users[user]:
 				try:
-					quote = quote + "\n" + unicode(line, "cp1252").encode("utf-8")
+					newline = unicode(line, "cp1252").encode("utf-8")
+					
+					if newline == unicode(line):
+						quote = quote + "\n" + line
+					else: # encoding has changed
+						quote = quote + "\n" + newline
 				except:
 					return self.send_message("Pues va a ser que no.")
 					
@@ -141,7 +146,12 @@ class QDB2(Module):
 					send = False
 				
 				try:
-					self.quote_users[user].append(msg.encode("utf-8"))
+					newmsg = msg.encode("utf-8")
+					
+					if newmsg == msg:
+						self.quote_users[user].append(msg)
+					else: # encoding has changed
+						self.quote_users[user].append(newmsg)
 				except:
 					self.quote_users[user].append(msg)
 				

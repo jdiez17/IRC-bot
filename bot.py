@@ -192,7 +192,6 @@ if __name__ == '__main__':
 	
 	plugins = [plugin_class() for plugin_class in load("modules", Module)]
 	for plugin in plugins:
-		print dir(plugin)
 		bot.load_module(plugin)
 	
 	bot.connect(config.get('core', 'server'), int(config.get('core', 'port')))
