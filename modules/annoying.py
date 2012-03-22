@@ -11,6 +11,8 @@ class Annoying(Module):
 			return self.ignore()
 			
 	def parse_raw(self, line):
+		return self.ignore() # disabled
+
 		if "JOIN " in line:
 			user = line.split(":")[1].split("!")[0]
 			if user == self.nick or user[:1] == "#":
