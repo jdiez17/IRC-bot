@@ -1,6 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 
-import ConfigParser, os, socket, sys, time, inspect
+import ConfigParser, os, socket, sys, time, inspect, logging, logging.handlers
 from straight.plugin import load
 
 class IRCBot():
@@ -12,6 +12,7 @@ class IRCBot():
 		self.s = None
 		self.modules = []
 		self.config = None
+		self.logger = None
 		
 		self.admins = []
 		self.transport = ""
@@ -21,16 +22,25 @@ class IRCBot():
 		
 	def log(self, line):
 		print line
+		self.logger.debug(line)
 		
-		file = open(self.config.get('log', 'path'), 'a')
-		file.write("[" + str(time.time()) + "] " + line + "\n")
-		
-		file.close()
-		
+	def log_info(self, line):
+		print line
+		self.logger.info(line)
+	
+	def log_warn(self, line):
+		print line
+		self.logger.warning(line)
+	
 	def lineReceived(self, line):
 		self.parse(line)
 			
 	def connect(self, server, port):
+		self.logger = logging.getLogger('bot')
+		self.logger.setLevel(logging.DEBUG)
+		handler = logging.handlers.TimedRotatingFileHandler(self.config.get('log', 'path') + 'bot.log', self.config.get('log', 'rollover'))
+		self.logger.addHandler(handler)
+	
 		self.s = socket.socket()
 		self.s.connect((server, port))
 		self.s.send("USER "+ self.nick +" "+ self.nick +" "+ self.nick +" :ariobot\n") 
@@ -60,11 +70,11 @@ class IRCBot():
 		return self.__send(msg)
 	
 	def __parse_response(self, response, module, bypass_lock = False):				
-		print "III " + str(response)
+		self.log_info("III " + str(response))
 		if response == None:
-			print "!!! Malfunction -> " + str(module)
+			self.log_warn("!!! Malfunction -> " + str(module))
 		elif response['accepted'] == -1:
-			print "!!! Malfunction (class 2) -> " + response['module']
+			self.log_warn("!!! Malfunction (class 2) -> " + response['module'])
 		elif response['accepted'] == True:
 			if not self.locked or bypass_lock:
 				if response.has_key('reconnect'):
@@ -118,8 +128,8 @@ class IRCBot():
 				self.user_cmd(msg, cmd, user, arg)
 			except:
 				raise
-				print "!!! " + line
-				print "!!! Possible bug."
+				self.log_warn("!!! " + line)
+				self.log_warn("!!! Possible bug.")
 		
 		else:
 			for module in self.modules:
@@ -132,7 +142,10 @@ class IRCBot():
 	def user_cmd(self, msg, cmd, user, arg):
 		for module in self.modules:
 			if "parse" in dir(module):
-				response = module.parse(msg, cmd, user, arg)
+				try:
+					response = module.parse(msg, cmd, user, arg)
+				except:
+					self.logger.exception("!!! Exception in module code.")
 				
 				resp_resp = self.__parse_response(response, module)
 				if resp_resp == True:
@@ -170,7 +183,7 @@ class IRCBot():
 									self.log(">>> " + line)
 									self.lineReceived(line)
 						else:
-							print "III Ignoring '" + lines + "'"
+							self.log_info("III Ignoring '" + lines + "'")
 				else:
 					lines = lines.split("\r\n")
 					for line in lines:
