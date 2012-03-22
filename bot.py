@@ -1,10 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 
-import ConfigParser, os
-import socket
-import sys
-import time
-
+import ConfigParser, os, socket, sys, time, inspect
+from straight.plugin import load
 
 class IRCBot():
 	def __init__(self):
@@ -185,32 +182,17 @@ class IRCBot():
 				sys.exit()
 	
 if __name__ == '__main__':
-	from modules.test import Test
-	from modules.toalla_r import Toalla_R
-	from modules.toalla import Toalla
-	from modules.admincommands import AdminCommands
-	from modules.annoying import Annoying
-	from modules.twirc import TwIRC
-	from modules.qdb import QDB2
-	from modules.antitoalla import AntiToalla
-	from modules.useful import Useful
-	from modules.texts import Texts
+	from modules.module import Module
 	
 	config = ConfigParser.ConfigParser()
 	config.readfp(open('config.ini'))
 	
 	bot = IRCBot()
-	
 	bot.set_config(config)
-	bot.load_module(Test())
-	bot.load_module(Useful())
-	bot.load_module(Toalla_R())
-	bot.load_module(Toalla())
-	bot.load_module(AdminCommands())
-	bot.load_module(Annoying())
-	bot.load_module(TwIRC())
-	bot.load_module(QDB2())
-	bot.load_module(AntiToalla())
-	bot.load_module(Texts())
+	
+	plugins = [plugin_class() for plugin_class in load("modules", Module)]
+	for plugin in plugins:
+		print dir(plugin)
+		bot.load_module(plugin)
 	
 	bot.connect(config.get('core', 'server'), int(config.get('core', 'port')))

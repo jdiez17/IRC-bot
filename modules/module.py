@@ -1,4 +1,4 @@
-class Module():
+class Module(object):
 	def __init__(self):
 		self.modname = "unnamed_mod"
 		self.admins = []
