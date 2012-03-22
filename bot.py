@@ -112,33 +112,47 @@ class IRCBot():
 			self.__send_raw("JOIN "+ self.home_channel +"\r\n") 
 			
 		elif "PRIVMSG" in line:
-			try:
-				try:
-					msg = line.split(":", 2)[2]
-				except:
-					return
-				cmd = msg.split(" ")[0]
-				#user = line.split(":")[1].split("!")[0]
+			if '\x01' in line: # ctcp
 				user = line.split(":")[1].split(" ")[0]
-				arg = msg.split(" ")[1:]
-			
-				if "PRIVMSG " + self.nick in line:
-					user = "**" + user # **user denotes private message.
-			
-				self.user_cmd(msg, cmd, user, arg)
-			except:
-				raise
-				self.log_warn("!!! " + line)
-				self.log_warn("!!! Possible bug.")
+				self.user_ctcp(user, line)
+			else:
+				try:
+					try:
+						msg = line.split(":", 2)[2]
+					except:
+						return
+					cmd = msg.split(" ")[0]
+					#user = line.split(":")[1].split("!")[0]
+					user = line.split(":")[1].split(" ")[0]
+					arg = msg.split(" ")[1:]
+				
+					if "PRIVMSG " + self.nick in line:
+						user = "**" + user # **user denotes private message.
+				
+					self.user_cmd(msg, cmd, user, arg)
+				except:
+					raise
+					self.log_warn("!!! " + line)
+					self.log_warn("!!! Possible bug.")
 		
 		else:
-			for module in self.modules:
-				if "parse_raw" in dir(module):
-					response = module.parse_raw(line)
-				
-					self.__parse_response(response, module) # no return, we don't want to end the chain here.
+			self.raw_user_cmd(line)
 				
 	
+	def user_ctcp(self, user, line):
+		for module in self.modules:
+			if "parse_ctcp" in dir(module):
+				response = module.parse_ctcp(user, line)
+			
+				self.__parse_response(response, module)
+	
+	def raw_user_cmd(self, line):
+		for module in self.modules:
+			if "parse_raw" in dir(module):
+				response = module.parse_raw(line)
+			
+				self.__parse_response(response, module) 
+				
 	def user_cmd(self, msg, cmd, user, arg):
 		for module in self.modules:
 			if "parse" in dir(module):
