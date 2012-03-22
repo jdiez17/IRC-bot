@@ -25,7 +25,7 @@ class AntiToalla(Module):
 			self.prepare_toallas()
 		
 			if msg.strip().lower() in self.toallas:
-				return self.recursion_no_message(".toalla", user, [user])
+				return self.recursion_no_message(".toalla", user, [self.get_username(user)])
 			else:
 				return self.ignore()
 		else:

@@ -94,3 +94,9 @@ class Module(object):
 				return True
 				
 		return False
+	
+	def get_username(self, user):
+		return user.split("!")[0]
+	
+	def get_vip(self, user):
+		return user.split("@")[0]

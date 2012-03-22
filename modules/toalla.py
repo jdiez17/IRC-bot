@@ -10,7 +10,7 @@ class Toalla(Module):
 		
 	def parse(self, msg, cmd, user, arg):
 		if self.nick.lower() in cmd.lower():
-			return self.recursion_no_message(".toalla", user, [user])
+			return self.recursion_no_message(".toalla", user, [self.get_username(user)])
 		elif ".toalla" == cmd:
 			toallas = open('/usr/share/toalla.txt')
 			override = self.is_admin(user)

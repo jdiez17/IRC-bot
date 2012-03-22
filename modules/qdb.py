@@ -96,7 +96,7 @@ class QDB2(Module):
 				return self.ignore()
 				
 			if user not in self.quote_users:
-					return self.send_raw_message("PRIVMSG " + user + " :Pega un quote antes.")
+					return self.send_raw_message("PRIVMSG " + self.get_username(user) + " :Pega un quote antes.")
 				
 			quote = ""
 			
@@ -122,7 +122,7 @@ class QDB2(Module):
 			if quote == "":
 				return self.ignore()
 			
-			payload = {'nick': user + ' (bot)', 'text': quote, 'comment': comment, 'hidden': private}
+			payload = {'nick': self.get_username(user) + ' (bot)', 'text': quote, 'comment': comment, 'hidden': private}
 			r = requests.post(self.qdb_api_post % self.qdb_secret, data=payload)
 			try:
 				r = json.loads(r.content)
@@ -130,12 +130,12 @@ class QDB2(Module):
 				return self.send_message('wodim, arregla el qdb.')
 			
 			self.quote_users[user] = []
-			return self.send_message(r['results']['url'] + " " + comment + " (" + user + ")")
+			return self.send_message(r['results']['url'] + " " + comment + " (" + self.get_username(user) + ")")
 		elif cmd == ".cancel" and user[:2] == "**":
 			user = user[2:]
 			
 			self.quote_users[user] = []
-			return self.send_raw_message("PRIVMSG " + user + " :Hecho.")
+			return self.send_raw_message("PRIVMSG " + self.get_username(user) + " :Hecho.")
 		elif user[:2] == "**":
 			user = user[2:]
 			
@@ -156,12 +156,12 @@ class QDB2(Module):
 					self.quote_users[user].append(msg)
 				
 				if send:
-					return self.send_raw_message("PRIVMSG " + user + " :Escribe .send <comentario> cuando termines, .send_private <comentario> para enviar quote privado, o .cancel para cancelar.")
+					return self.send_raw_message("PRIVMSG " + self.get_username(user) + " :Escribe .send <comentario> cuando termines, .send_private <comentario> para enviar quote privado, o .cancel para cancelar.")
 				else:
 					return self.accept()
 			else:
 				self.quote_users[user] = [msg]
-				return self.send_raw_message("PRIVMSG " + user + " :Escribe .send <comentario> cuando termines, .send_private <comentario> para enviar quote privado, o .cancel para cancelar.")
+				return self.send_raw_message("PRIVMSG " + self.get_username(user) + " :Escribe .send <comentario> cuando termines, .send_private <comentario> para enviar quote privado, o .cancel para cancelar.")
 
 		else:
 			return self.ignore()

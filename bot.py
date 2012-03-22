@@ -108,7 +108,8 @@ class IRCBot():
 				except:
 					return
 				cmd = msg.split(" ")[0]
-				user = line.split(":")[1].split("!")[0]
+				#user = line.split(":")[1].split("!")[0]
+				user = line.split(":")[1].split(" ")[0]
 				arg = msg.split(" ")[1:]
 			
 				if "PRIVMSG " + self.nick in line:
