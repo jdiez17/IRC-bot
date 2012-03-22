@@ -44,7 +44,7 @@ class QDB2(Module):
 							return self.send_message("No quotes matching that criteria found.")
 						else:
 							for quote in result['results']['data']:
-								firstline = quote['text'].split("\n")[0]
+								firstline = quote['excerpt']
 								response.add_action(self.send_message(quote['permaid'] + " - " + quote['nick'] + ": '" + firstline + "'"))
 							
 							response.add_action(self.send_message("Escribe .read <id> para leer el quote completo."))
