@@ -14,7 +14,7 @@ class Useful(Module):
 			choice = possibilities[random.randint(0, len(possibilities) -1)]
 			
 			if choice:
-				return self.send_message(user + ": " + choice)
+				return self.send_message(self.get_username(user) + ": " + choice)
 			else:
 				return self.ignore()
 		else:
