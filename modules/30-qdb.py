@@ -14,6 +14,7 @@ class QDB2(Module):
 		self.qdb_login = "http://qdb.vortigaunt.net/login/%s"
 		self.qdb_api_read = "http://qdb.vortigaunt.net/api/read/%s"
 		self.qdb_api_search = "http://qdb.vortigaunt.net/api/search/%s"
+		self.qdb_api_delete = "http://qdb.vortigaunt.net/api/delete/%s"
 		
 		self.qdb_secret = ""
 		self.qdb_password = ""
@@ -29,6 +30,31 @@ class QDB2(Module):
 		self.initialized = True
 		
 	def parse(self, msg, cmd, user, arg):
+		if cmd == ".delete":
+			try:
+				result = requests.post(self.qdb_api_read % self.qdb_secret, data={'permaid': arg[0]})
+			except:
+				return self.send_message("Tu puta madre.")
+			
+			try:
+				result = json.loads(result.content)
+			except:
+				return self.send_message("wodim, arregla el qdb.")
+			
+			if result['results']['data']['ip'] == self.get_vip(user):
+				try:
+					result = requests.post(self.qdb_api_delete % self.qdb_secret, data={'permaid': arg[0]})
+					result = json.loads(result.content)
+					
+					if result['results']['success'] == 1:
+						return self.send_message("Hecho.")
+					else:
+						return self.send_message("No hecho. (qdb)")
+				except:
+					return self.send_message("Tu puta madre. " + result.content)
+			else:
+				return self.send_message("No autorizado.")
+			
 		if cmd == ".search":
 			response = Response()
 			try:
@@ -69,7 +95,7 @@ class QDB2(Module):
 				if result['results'].has_key('success'):
 					if result['results']['success'] == 1:
 						quote = result['results']['data']['text'].split("\n")
-						response.add_action(self.send_message('Enviado por ' + result['results']['data']['nick'] + ':'))
+						response.add_action(self.send_message('Enviado por ' + result['results']['data']['nick'] + ' (' + result['results']['data']['ip'] + ') :'))
 						
 						for line in quote:
 							if "\r" in line or "\n" in line:	
