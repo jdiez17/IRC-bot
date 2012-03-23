@@ -115,7 +115,6 @@ class QDB2(Module):
 						problem = {'hidden_quote': 'The quote is hidden.', 'no_such_quote': 'No such quote exists.'}[result['results']['error']]
 						response.add_action(self.send_message("Error: " + problem))
 			except:
-				raise
 				return self.send_message('wodim, arregla el qdb.')
 				
 			return self.multiple_response(response.generate_response())
