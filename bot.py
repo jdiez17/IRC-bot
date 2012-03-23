@@ -10,7 +10,9 @@ class IRCBot():
 		self.home_channel = ""
 		
 		self.s = None
-		self.modules = []
+		self.tmp_modules = []
+		self.modules = dict()
+		self.__seqno = 0
 		self.config = None
 		self.logger = None
 		
@@ -47,11 +49,12 @@ class IRCBot():
 		self.s.send("NICK "+ self.nick +"\r\n")
 		
 		print "Loaded modules: "
-		for module in self.modules:
-			print "- " + module.modname
+		for seqno in self.modules:
+			print "- " + self.modules[seqno].modname + " (" + str(seqno) + ")"
 		
 		time.sleep(2)
 		self.main_loop()
+		sys.exit() # should never be reached
 		
 	def __send_raw(self, cmd):
 		self.log("<<< " + cmd)
@@ -147,14 +150,18 @@ class IRCBot():
 				self.__parse_response(response, module)
 	
 	def raw_user_cmd(self, line):
-		for module in self.modules:
+		for seq in self.modules:
+			module = self.modules[seq]
+			
 			if "parse_raw" in dir(module):
 				response = module.parse_raw(line)
 			
 				self.__parse_response(response, module) 
 				
 	def user_cmd(self, msg, cmd, user, arg):
-		for module in self.modules:
+		for seq in self.modules:
+			module = self.modules[seq]
+			
 			if "parse" in dir(module):
 				try:
 					response = module.parse(msg, cmd, user, arg)
@@ -173,11 +180,59 @@ class IRCBot():
 		self.home_channel = config.get('core', 'home_channel')
 		self.password = config.get('core', 'password')
 	
+	def module_with_priority(self, priority):
+		howmany = 0
+	
+		for module in self.tmp_modules:
+			if "priority" in dir(module):
+				if module.priority == priority:
+					howmany += 1
+		
+		return False if howmany == 0 else howmany
+	
+	def get_next_seqno(self):
+		proposed_seqno = 0
+		
+		while proposed_seqno == 0:
+			proposed_seqno = self.__seqno if not self.module_with_priority(self.__seqno) else 0
+			if proposed_seqno == 0:
+				self.__seqno += 1
+		return proposed_seqno
+	
 	def load_module(self, module):
 		module.set_admins(self.admins)
 		module.set_nick(self.nick)
 		module.set_config(self.config)
-		self.modules.append(module)
+		
+		self.tmp_modules.append(module)
+		
+	def check_repeated_priorities(self):
+		print "check_repeated_priorities"
+	
+		for module in self.tmp_modules:
+			if "priority" in dir(module):
+				if self.module_with_priority(module.priority) > 1:
+					module.priority += 1
+					
+					self.check_repeated_priorities() # here be recursion
+	
+	def end_load_modules(self):
+		self.check_repeated_priorities()
+	
+		for module in self.tmp_modules:
+			self.__seqno += 1
+			seqno = 0
+	
+			if "priority" in dir(module):
+				seqno = module.priority
+			else:
+				seqno = self.get_next_seqno()
+			
+			while self.modules.has_key(seqno):
+				seqno += 1
+				self.__seqno += 1
+					
+			self.modules[seqno] = module
 		
 	def main_loop(self):
 		while 1:
@@ -221,5 +276,6 @@ if __name__ == '__main__':
 	plugins = [plugin_class() for plugin_class in load("modules", Module)]
 	for plugin in plugins:
 		bot.load_module(plugin)
+	bot.end_load_modules()
 	
 	bot.connect(config.get('core', 'server'), int(config.get('core', 'port')))

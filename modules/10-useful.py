@@ -4,6 +4,7 @@ import random
 class Useful(Module):
 	def __init__(self):
 		self.modname = "Useful Bot"
+		self.priority = 1
 		
 	def parse_ctcp(self, user, line):
 		if '\x01' + "VERSION" + '\x01' in line:

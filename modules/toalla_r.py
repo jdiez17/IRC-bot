@@ -9,6 +9,7 @@ class Toalla_R(Module):
 		self.modname = "Toalla Regular Expressions"
 		self.last_toalla = 0
 		self.toalla_timeout = 5
+		self.priority = 3
 
 	def parse(self, msg, cmd, user, arg):
 		if ".toalla_r" == cmd:

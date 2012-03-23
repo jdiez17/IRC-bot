@@ -7,6 +7,7 @@ class Toalla(Module):
 		self.modname = "ToallaBot"
 		self.last_toalla = 0
 		self.toalla_timeout = 5
+		self.priority = 2
 		
 	def parse(self, msg, cmd, user, arg):
 		if self.nick.lower() in cmd.lower():

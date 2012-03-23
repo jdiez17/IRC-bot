@@ -3,7 +3,6 @@ from module import Module
 class AntiToalla(Module):
 	def __init__(self):
 		self.modname = "AntiToalla"
-		
 				
 	def prepare_toallas(self):
 		self.toallas = open('/usr/share/toalla.txt')

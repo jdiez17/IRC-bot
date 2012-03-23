@@ -19,6 +19,7 @@ class QDB2(Module):
 		self.qdb_password = ""
 		self.quote_users = {}
 		self.initialized = False
+		self.priority = 4
 		
 	def initialize(self):
 		if self.initialized: return
