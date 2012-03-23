@@ -94,19 +94,28 @@ class QDB2(Module):
 			
 				if result['results'].has_key('success'):
 					if result['results']['success'] == 1:
-						quote = result['results']['data']['text'].split("\n")
-						response.add_action(self.send_message('Enviado por ' + result['results']['data']['nick'] + ' (' + result['results']['data']['ip'] + ') :'))
-						
-						for line in quote:
-							if "\r" in line or "\n" in line:	
-								for subline in line.split("\r\n"):
-									response.add_action(self.send_message(subline))
-							else:
-								response.add_action(self.send_message(line))
+						if result['results']['data']['status'] == "deleted":
+							return self.send_message("Quote is deleted.")
+						else:
+							quote = result['results']['data']['text'].split("\n")
+							response.add_action(self.send_message('Enviado por ' + result['results']['data']['nick'] + ' (' + result['results']['data']['ip'] + '):'))
+							
+							for line in quote:
+								if "\r" in line or "\n" in line:	
+									for subline in line.split("\r\n"):
+										response.add_action(self.send_message(subline))
+								else:
+									response.add_action(self.send_message(line))
+									
+							if result['results']['data']['comment']:
+								comment = result['results']['data']['comment']
+								dashes_length = int((40 - len(comment)) / 2) # little decorator
+								response.add_action(self.send_message(("-" * dashes_length) + comment + ("-" * dashes_length)))
 					else:
 						problem = {'hidden_quote': 'The quote is hidden.', 'no_such_quote': 'No such quote exists.'}[result['results']['error']]
 						response.add_action(self.send_message("Error: " + problem))
 			except:
+				raise
 				return self.send_message('wodim, arregla el qdb.')
 				
 			return self.multiple_response(response.generate_response())
