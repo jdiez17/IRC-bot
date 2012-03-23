@@ -122,7 +122,7 @@ class QDB2(Module):
 			if quote == "":
 				return self.ignore()
 			
-			payload = {'nick': self.get_username(user) + ' (bot)', 'text': quote, 'comment': comment, 'hidden': private}
+			payload = {'nick': self.get_username(user) + ' (bot)', 'text': quote, 'comment': comment, 'hidden': private, 'ip': self.get_vip(user)}
 			r = requests.post(self.qdb_api_post % self.qdb_secret, data=payload)
 			try:
 				r = json.loads(r.content)

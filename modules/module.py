@@ -99,4 +99,4 @@ class Module(object):
 		return user.split("!")[0]
 	
 	def get_vip(self, user):
-		return user.split("@")[0]
+		return user.split("@")[1]
