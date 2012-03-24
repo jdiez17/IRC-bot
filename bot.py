@@ -80,8 +80,10 @@ class IRCBot():
 			self.log_warn("!!! Malfunction (class 2) -> " + response['module'])
 		elif response['accepted'] == True:
 			if not self.locked or bypass_lock:
+				if response.has_key('ctcp_command'):
+					self.__send_raw("NOTICE " + response['ctcp_who'] + " :" + '\x01' + response['ctcp_command'] + " " + response['ctcp_response'] + '\x01') 
 				if response.has_key('reconnect'):
-					self.transport.loseConnection()
+					sys.exit()
 				if response.has_key('acquire_lock'):
 					self.locked = True
 					self.lock_ended = False
@@ -143,7 +145,9 @@ class IRCBot():
 				
 	
 	def user_ctcp(self, user, line):
-		for module in self.modules:
+		for seq in self.modules:
+			module = self.modules[seq]
+			
 			if "parse_ctcp" in dir(module):
 				response = module.parse_ctcp(user, line)
 			

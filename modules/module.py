@@ -95,6 +95,16 @@ class Module(object):
 				
 		return False
 	
+	def send_ctcp(self, who, command, res):
+		response = {}
+		response['accepted'] = True
+		response['module'] = self.modname
+		response['ctcp_who'] = who
+		response['ctcp_command'] = command
+		response['ctcp_response'] = res
+		
+		return response
+	
 	def get_username(self, user):
 		return user.split("!")[0]
 	

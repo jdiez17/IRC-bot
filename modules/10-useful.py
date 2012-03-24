@@ -8,7 +8,7 @@ class Useful(Module):
 		
 	def parse_ctcp(self, user, line):
 		if '\x01' + "VERSION" + '\x01' in line:
-			return self.send_raw_message("NOTICE " + self.get_username(user) + " :" + '\x01' + "VERSION " + self.config.get('core', 'version') + '\x01')
+			return self.send_ctcp(self.get_username(user), "VERSION", self.config.get('core', 'version'))
 			
 	def parse(self, msg, cmd, user, arg):
 		if self.nick in cmd and " o " in msg and "?" in msg:
