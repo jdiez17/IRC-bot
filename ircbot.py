@@ -170,7 +170,7 @@ class IRCBot(object):
 				except:
 					self.logger.exception("!!! Exception in module code.")
 				
-				resp_resp = self.__parse_response(response, module)
+				resp_resp = self.__parse_response(response, module, module.is_admin(module.get_username(user)))
 				if resp_resp == True:
 					return True
 	

@@ -22,6 +22,12 @@ class AdminCommands(Module):
 		if cmd == ".rehash":
 			return self.reconnect()
 			
+		if cmd == ".lock":
+			return self.acquire_lock()
+			
+		if cmd == ".unlock":
+			return self.release_lock();
+			
 		if cmd == ".gitupdate":
 			proc = Popen(['git', 'pull'], stdout=PIPE, stderr=PIPE)
 			code = proc.wait()

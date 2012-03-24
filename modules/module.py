@@ -110,3 +110,9 @@ class Module(object):
 	
 	def get_vip(self, user):
 		return user.split("@")[1]
+		
+	def acquire_lock(self):
+		return {'acquire_lock': True, 'accepted': True};
+		
+	def release_lock(self):
+		return {'release_lock': True, 'accepted':  True};
