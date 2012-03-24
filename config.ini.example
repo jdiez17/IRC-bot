@@ -5,7 +5,7 @@ nick =
 password = 
 home_channel = 
 admin = 
-version = Natychan v14.88 NHL
+version = Natychan v14.88 
 
 [qdb]
 apikey = 
