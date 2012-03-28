@@ -120,7 +120,7 @@ class QDB2(Module):
 			return self.multiple_response(response.generate_response())
 		if cmd == ".password":
 			m = hashlib.md5()
-			m.update(date.today().strftime("%d/%m/%Y") + self.qdb_password)
+			m.update(date.today().strftime("%d/%m/%Y") + self.qdb_secret)
 			password = m.hexdigest()[:8]
 			
 			return self.send_message(self.qdb_login % password)
