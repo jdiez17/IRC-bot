@@ -22,22 +22,10 @@ class Toalla(Module):
 			
 			toa_list = [] 
 			
-
-			try:
-				times = int(arg[0])
-				
-				if times > 22:
-					return self.send_message("Y una mierda.")
-				if times == 0:
-					return self.ignore()
-					
-				nick = ' '.join(arg[1:]).strip()
-			except:
-				times = 1
-				nick = ' '.join(arg[0:]).strip()
+			times = 1
+			nick = ' '.join(arg[0:]).strip()
 
 			if nick[:1] == "@":
-				times = 1
 				tollatweet = True
 			else:
 				tollatweet = False
@@ -60,10 +48,8 @@ class Toalla(Module):
 			if tollatweet:
 				return self.recursion_no_message(".tweet", user, [the_toalla])
 			else:
-				if times > 1:
-					return self.recursion_with_message(the_toalla, ".toalla", user, [times-1, nick])
-				else:
-					return self.send_message(the_toalla)
+				return self.send_message(the_toalla)
+				
 			self.last_toalla = time.time()
 		else:
 			return self.ignore()
