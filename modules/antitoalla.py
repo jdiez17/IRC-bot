@@ -19,7 +19,7 @@ class AntiToalla(Module):
 			
 		self.toallas = new_toallas
 		
-	def parse(self, msg, cmd, user, arg):
+	def parse_custom(self, msg, cmd, user, arg):
 		if self.admins[0] in cmd:
 			self.prepare_toallas()
 		

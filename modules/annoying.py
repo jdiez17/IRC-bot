@@ -4,7 +4,7 @@ class Annoying(Module):
 	def __init__(self):
 		self.modname = "Annoying bot"
 		
-	def parse(self, msg, cmd, user, arg):
+	def parse_custom(self, msg, cmd, user, arg):
 		if " ok?" in msg or "ok?" == cmd:
 			return self.send_message("ok")
 		else:

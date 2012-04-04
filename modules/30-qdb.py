@@ -22,6 +22,15 @@ class QDB2(Module):
 		self.initialized = False
 		self.priority = 4
 		
+		self.commands = dict()
+		self.add_command(".delete", self.delete)
+		self.add_command(".search", self.search)
+		self.add_command(".read", self.read)
+		self.add_command(".send", self.send)
+		self.add_command(".send_private", self.send)
+		self.add_command(".cancel", self.cancel)
+		self.add_command(".password", self.password)
+		
 	def initialize(self):
 		if self.initialized: return
 		
@@ -29,101 +38,104 @@ class QDB2(Module):
 		self.qdb_password = self.config.get('qdb', 'password')
 		self.initialized = True
 		
-	def parse(self, msg, cmd, user, arg):
-		if cmd == ".delete":
+	def delete(self, msg, cmd, user, arg):
+		try:
+			result = requests.post(self.qdb_api_read % self.qdb_secret, data={'permaid': arg[0]})
+		except:
+			return self.send_message("Tu puta madre.")
+		
+		try:
+			result = json.loads(result.content)
+		except:
+			return self.send_message("wodim, arregla el qdb.")
+		
+		if result['results']['data']['ip'] == self.get_vip(user):
 			try:
-				result = requests.post(self.qdb_api_read % self.qdb_secret, data={'permaid': arg[0]})
-			except:
-				return self.send_message("Tu puta madre.")
-			
-			try:
-				result = json.loads(result.content)
-			except:
-				return self.send_message("wodim, arregla el qdb.")
-			
-			if result['results']['data']['ip'] == self.get_vip(user):
-				try:
-					result = requests.post(self.qdb_api_delete % self.qdb_secret, data={'permaid': arg[0]})
-					result = json.loads(result.content)
-					
-					if result['results']['success'] == 1:
-						return self.send_message("Hecho.")
-					else:
-						return self.send_message("No hecho. (qdb)")
-				except:
-					return self.send_message("Tu puta madre. " + result.content)
-			else:
-				return self.send_message("No autorizado.")
-			
-		if cmd == ".search":
-			response = Response()
-			try:
-				result = requests.post(self.qdb_api_search % self.qdb_secret, data={'criteria': ' '.join(arg), 'page_size': 10})
-			except:
-				return self.send_message("Tu puta madre.")
-			
-			try:
+				result = requests.post(self.qdb_api_delete % self.qdb_secret, data={'permaid': arg[0]})
 				result = json.loads(result.content)
 				
-				if result['results'].has_key('success'):
-					if result['results']['success'] == 1:
-						if result['results']['count'] == 0:
-							return self.send_message("No quotes matching that criteria found.")
-						else:
-							for quote in result['results']['data']:
-								firstline = quote['excerpt']
-								response.add_action(self.send_message(quote['permaid'] + " - " + quote['nick'] + ": '" + firstline + "'"))
+				if result['results']['success'] == 1:
+					return self.send_message("Hecho.")
+				else:
+					return self.send_message("No hecho. (qdb)")
+			except:
+				return self.send_message("Tu puta madre. " + result.content)
+		else:
+			return self.send_message("No autorizado.")
+	
+	def search(self, msg, cmd, user, arg): 
+		response = Response()
+		try:
+			result = requests.post(self.qdb_api_search % self.qdb_secret, data={'criteria': ' '.join(arg), 'page_size': 10})
+		except:
+			return self.send_message("Tu puta madre.")
+		
+		try:
+			result = json.loads(result.content)
+			
+			if result['results'].has_key('success'):
+				if result['results']['success'] == 1:
+					if result['results']['count'] == 0:
+						return self.send_message("No quotes matching that criteria found.")
+					else:
+						for quote in result['results']['data']:
+							firstline = quote['excerpt']
+							response.add_action(self.send_message(quote['permaid'] + " - " + quote['nick'] + ": '" + firstline + "'"))
+						
+						response.add_action(self.send_message("Escribe .read <id> para leer el quote completo."))
 							
-							response.add_action(self.send_message("Escribe .read <id> para leer el quote completo."))
+				else:
+					return self.send_message("Algo se ha roto. (dunno lol)")
+		except:
+			raise
+			return self.send_message("wodim, arregla el qdb.")
+			
+		return self.multiple_response(response.generate_response())
+		
+	def read(self, msg, cmd, user, arg):
+		response = Response()
+		try:
+			result = requests.post(self.qdb_api_read % self.qdb_secret, data={'permaid': arg[0]})
+		except:
+			return self.send_message("Tu puta madre.")
+		try:
+			result = json.loads(result.content)
+		
+			if result['results'].has_key('success'):
+				if result['results']['success'] == 1:
+					if result['results']['data']['status'] == "deleted":
+						return self.send_message("Quote is deleted.")
+					else:
+						quote = result['results']['data']['text'].split("\n")
+						response.add_action(self.send_message('Enviado por ' + result['results']['data']['nick'] + ' (' + result['results']['data']['ip'] + '):'))
+						
+						for line in quote:
+							if "\r" in line or "\n" in line:	
+								for subline in line.split("\r\n"):
+									response.add_action(self.send_message(subline))
+							else:
+								response.add_action(self.send_message(line))
 								
-					else:
-						return self.send_message("Algo se ha roto. (dunno lol)")
-			except:
-				raise
-				return self.send_message("wodim, arregla el qdb.")
-				
-			return self.multiple_response(response.generate_response())
-		if cmd == ".read":
-			response = Response()
-			try:
-				result = requests.post(self.qdb_api_read % self.qdb_secret, data={'permaid': arg[0]})
-			except:
-				return self.send_message("Tu puta madre.")
-			try:
-				result = json.loads(result.content)
+						if result['results']['data']['comment']:
+							comment = result['results']['data']['comment']
+							dashes_length = int((40 - len(comment)) / 2) # little decorator
+							response.add_action(self.send_message(("-" * dashes_length) + comment + ("-" * dashes_length)))
+				else:
+					problem = {'hidden_quote': 'The quote is hidden.', 'no_such_quote': 'No such quote exists.'}[result['results']['error']]
+					response.add_action(self.send_message("Error: " + problem))
+		except:
+			return self.send_message('wodim, arregla el qdb.')
 			
-				if result['results'].has_key('success'):
-					if result['results']['success'] == 1:
-						if result['results']['data']['status'] == "deleted":
-							return self.send_message("Quote is deleted.")
-						else:
-							quote = result['results']['data']['text'].split("\n")
-							response.add_action(self.send_message('Enviado por ' + result['results']['data']['nick'] + ' (' + result['results']['data']['ip'] + '):'))
-							
-							for line in quote:
-								if "\r" in line or "\n" in line:	
-									for subline in line.split("\r\n"):
-										response.add_action(self.send_message(subline))
-								else:
-									response.add_action(self.send_message(line))
-									
-							if result['results']['data']['comment']:
-								comment = result['results']['data']['comment']
-								dashes_length = int((40 - len(comment)) / 2) # little decorator
-								response.add_action(self.send_message(("-" * dashes_length) + comment + ("-" * dashes_length)))
-					else:
-						problem = {'hidden_quote': 'The quote is hidden.', 'no_such_quote': 'No such quote exists.'}[result['results']['error']]
-						response.add_action(self.send_message("Error: " + problem))
-			except:
-				return self.send_message('wodim, arregla el qdb.')
-				
-			return self.multiple_response(response.generate_response())
-		if cmd == ".password":
-			m = hashlib.md5()
-			m.update(date.today().strftime("%d/%m/%Y") + self.qdb_secret)
-			password = m.hexdigest()[:8]
-			
-			return self.send_message(self.qdb_login % password)
+		return self.multiple_response(response.generate_response())
+	
+	def password(self, msg, cmd, user, arg):
+		m = hashlib.md5()
+		m.update(date.today().strftime("%d/%m/%Y") + self.qdb_secret)
+		password = m.hexdigest()[:8]
+		
+		return self.send_message(self.qdb_login % password)
+		
+	def send(self, msg, cmd, user, arg):
 		if msg[:5] == ".send":
 			if user[:2] == "**":
 				user = user[2:].strip()
@@ -165,12 +177,17 @@ class QDB2(Module):
 			
 			self.quote_users[user] = []
 			return self.send_message(r['results']['url'] + " " + comment + " (" + self.get_username(user) + ")")
-		elif cmd == ".cancel" and user[:2] == "**":
+			
+	def cancel(self, msg, cmd, user, arg):
+		if user[:2] == "**":
 			user = user[2:]
 			
 			self.quote_users[user] = []
 			return self.send_raw_message("PRIVMSG " + self.get_username(user) + " :Hecho.")
-		elif user[:2] == "**":
+			
+		
+	def parse_custom(self, msg, cmd, user, arg):
+		if user[:2] == "**":
 			user = user[2:]
 			
 			if user in self.quote_users:
@@ -196,6 +213,3 @@ class QDB2(Module):
 			else:
 				self.quote_users[user] = [msg]
 				return self.send_raw_message("PRIVMSG " + self.get_username(user) + " :Escribe .send <comentario> cuando termines, .send_private <comentario> para enviar quote privado, o .cancel para cancelar.")
-
-		else:
-			return self.ignore()

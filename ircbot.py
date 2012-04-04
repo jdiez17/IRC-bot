@@ -148,7 +148,6 @@ class IRCBot(object):
 			
 			if "parse_ctcp" in dir(module):
 				response = module.parse_ctcp(user, line)
-			
 				self.__parse_response(response, module)
 	
 	def raw_user_cmd(self, line):
@@ -169,7 +168,7 @@ class IRCBot(object):
 					response = module.parse(msg, cmd, user, arg)
 				except:
 					self.logger.exception("!!! Exception in module code.")
-				
+
 				resp_resp = self.__parse_response(response, module, module.is_admin(module.get_username(user)))
 				if resp_resp == True:
 					return True

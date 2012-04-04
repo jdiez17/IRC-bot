@@ -10,7 +10,7 @@ class Useful(Module):
 		if '\x01' + "VERSION" + '\x01' in line:
 			return self.send_ctcp(self.get_username(user), "VERSION", self.config.get('core', 'version'))
 			
-	def parse(self, msg, cmd, user, arg):
+	def parse_custom(self, msg, cmd, user, arg):
 		if self.nick in cmd and " o " in msg and "?" in msg:
 			question = msg.replace(cmd, '')
 			question = question.replace('?', '')
@@ -20,8 +20,3 @@ class Useful(Module):
 			
 			if choice:
 				return self.send_message(self.get_username(user) + ": " + choice)
-			else:
-				return self.ignore()
-				
-		else:
-			return self.ignore()

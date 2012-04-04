@@ -5,6 +5,24 @@ class Module(object):
 		self.nick = ""
 		self.config = None
 		
+	def add_command(self, trigger, function):
+		self.commands[trigger] = function
+	
+	def parse(self, msg, cmd, user, arg): # standard prototype
+		if "commands" in dir(self):
+			for trigger in self.commands:
+				if cmd == trigger:
+					return self.commands[cmd](msg, cmd, user, arg)
+		
+		if "parse_custom" in dir(self):
+			response = self.parse_custom(msg, cmd, user, arg)
+			if response != None: 
+				return response
+			else:
+				return self.ignore()
+			
+		return self.ignore()
+		
 	def set_admins(self, admins):
 		self.admins = admins
 	

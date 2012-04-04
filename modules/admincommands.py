@@ -5,6 +5,13 @@ from subprocess import Popen, PIPE
 class AdminCommands(Module):
 	def __init__(self):
 		self.modname = "Admin Commands"
+		self.commands = dict()
+		
+		self.add_command(".rehash", self.rehash)
+		self.add_command(".lock", self.lock)
+		self.add_command(".unlock", self.unlock)
+		self.add_command(".gitupdate", self.gitupdate)
+		self.add_command(".parrot", self.parrot)
 		
 	def parse_raw(self, line):
 		if "ERROR :Closing Link:" in line:
@@ -15,35 +22,34 @@ class AdminCommands(Module):
 		else:
 			return self.ignore()
 	
-	def parse(self, msg, cmd, user, arg):
+	def rehash(self, msg, cmd, user, arg):
 		if not self.is_admin(user):
 			return self.ignore()
-			
-		if cmd == ".rehash":
-			return self.reconnect()
-			
-		if cmd == ".lock":
-			return self.acquire_lock()
-			
-		if cmd == ".unlock":
-			return self.release_lock();
-			
-		if cmd == ".gitupdate":
-			proc = Popen(['git', 'pull'], stdout=PIPE, stderr=PIPE)
-			code = proc.wait()
-			if code == 0:
-				proc_msg = proc.stdout.read()
-				if "Already up-to-date." in proc_msg:
-					return self.send_message("No updates found.")
-					
-				return self.send_message("Updated.")
-		if cmd == ".parrot":
-			msg = msg.replace(cmd + " ", "")
-			return self.send_message(msg)
-			
-		if cmd == ".join":
-			return self.send_raw_message("JOIN " + arg[0])
-			
-		else:
+		return self.reconnect()
+	
+	def lock(self, msg, cmd, user, arg):
+		if not self.is_admin(user):
 			return self.ignore()
+		return self.acquire_lock()
+	
+	def unlock(self, msg, cmd, user, arg):
+		if not self.is_admin(user):
+			return self.ignore()
+		return self.release_lock()
+	
+	def gitupdate(self, msg, cmd, user, arg):
+		proc = Popen(['git', 'pull'], stdout=PIPE, stderr=PIPE)
+		code = proc.wait()
+		if code == 0:
+			proc_msg = proc.stdout.read()
+			if "Already up-to-date." in proc_msg:
+				return self.send_message("No updates found.")
+				
+			return self.send_message("Updated.")
+	
+	def parrot(self, msg, cmd, user, arg):
+		if not self.is_admin(user):
+			return self.ignore()
+		msg = msg.replace(cmd + " ", "")
+		return self.send_message(msg)
 		
