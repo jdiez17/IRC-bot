@@ -54,7 +54,7 @@ class Operator(Module):
 			
 		comment = self.comment(arg)
 	
-		return self.send_raw_message("KICK " + self.config.get('core', 'home_channel') + " " + who + " " + comment)
+		return self.send_raw_message("KICK " + self.config.get('core', 'home_channel') + " " + who + " :" + comment)
 	
 	def ban(self, msg, cmd, user, arg):
 		who = self.who_complete(user, arg)
