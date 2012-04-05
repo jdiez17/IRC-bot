@@ -4,6 +4,7 @@ class Operator(Module):
 	def __init__(self):
 		self.modname = "Operator"
 		self.commands = dict()
+		self.priority = 3
 		
 		self.add_command(".op", self.op)
 		self.add_command(".deop", self.deop)

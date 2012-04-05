@@ -124,6 +124,9 @@ class Module(object):
 		return response
 	
 	def get_username(self, user):
+		if user[:2] == "**":
+			user = user[2:]
+			
 		return user.split("!")[0]
 	
 	def get_vip(self, user):
