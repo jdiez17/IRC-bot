@@ -134,3 +134,6 @@ class Module(object):
 		
 	def release_lock(self):
 		return {'release_lock': True, 'accepted':  True};
+		
+	def special_request(self, request, callback):
+		return {'special_request': request, 'callback': callback, 'accepted': True, 'module': self.modname};
