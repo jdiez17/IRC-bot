@@ -31,7 +31,7 @@ class Operator(Module):
 		
 	def comment(self, arg):
 		try:
-			comment = arg[1]
+			comment = " ".join(arg[1:])
 		except:
 			comment = ""
 			
