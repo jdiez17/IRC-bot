@@ -80,6 +80,8 @@ class IRCBot(object):
 			if not self.locked or bypass_lock:
 				if response.has_key('ctcp_command'):
 					self.__send_raw("NOTICE " + response['ctcp_who'] + " :" + '\x01' + response['ctcp_command'] + " " + response['ctcp_response'] + '\x01') 
+				if response.has_key('special_request'):
+					self.__handle_special_request(response)
 				if response.has_key('reconnect'):
 					sys.exit()
 				if response.has_key('acquire_lock'):
@@ -172,6 +174,26 @@ class IRCBot(object):
 				resp_resp = self.__parse_response(response, module, module.is_admin(module.get_username(user)))
 				if resp_resp == True:
 					return True
+	
+	def __handle_special_request(self, response):
+		if response['special_request'] == 'get_modules':
+			modules = [] 
+			for seq in self.modules:
+				modules.append(self.modules[seq].modname)
+			
+			self.__parse_response(response['callback'](modules), response['module'])
+		
+		if response['special_request'] == 'get_commands':
+			try: 
+				commands = []
+				for seq in self.modules:
+					if self.modules[seq].modname == response['extra'][0]:
+						for command in self.modules[seq].commands:
+							commands.append(command)
+				
+				self.__parse_response(response['callback'](commands), response['module'])
+			except:
+				self.__parse_response(response['callback']([]), response['module'])
 	
 	def set_config(self, config):
 		self.config = config
