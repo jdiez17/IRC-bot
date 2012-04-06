@@ -21,7 +21,10 @@ class IRCBot(object):
 		self.lock_ended = False
 		
 	def log(self, line):
-		print line
+		try:
+			print line
+		except:
+			pass
 		self.logger.debug(line)
 		
 	def log_info(self, line):
