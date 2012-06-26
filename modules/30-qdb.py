@@ -194,6 +194,7 @@ class QDB2(Module):
 					send = False
 	
 					self.quote_users[user].append(msg)
+					print self.quote_users[user]
 				if send:
 					return self.send_raw_message("PRIVMSG " + self.get_username(user) + " :Escribe .send <comentario> cuando termines, .send_private <comentario> para enviar quote privado, o .cancel para cancelar.")
 				else:
