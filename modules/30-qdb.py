@@ -155,14 +155,7 @@ class QDB2(Module):
 				private = 0
 				
 			for line in self.quote_users[user]:
-				try:
-					try:
-						newline = line.decode("utf-8")
-					except:
-						newline = unicode(line, "cp1252").encode("utf-8")
-					quote = quote + "\n" + newline
-				except:
-					return self.send_message("Pues va a ser que no.")
+				quote = quote + "\n" + unicode(line)
 					
 			
 			if quote == "":
@@ -176,7 +169,7 @@ class QDB2(Module):
 				return self.send_message('wodim, arregla el qdb.')
 			
 			self.quote_users[user] = []
-			return self.send_message(r['results']['url'] + " " + comment + " (" + self.get_username(user) + ")")
+			return self.send_message(r['results']['url'] + " " + unicode(comment) + " (" + self.get_username(user) + ")")
 			
 	def cancel(self, msg, cmd, user, arg):
 		if user[:2] == "**":
