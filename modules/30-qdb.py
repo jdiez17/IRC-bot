@@ -49,20 +49,23 @@ class QDB2(Module):
 		except:
 			return self.send_message("wodim, arregla el qdb.")
 		
-		if result['results']['data']['ip'] == self.get_vip(user):
-			try:
-				result = requests.post(self.qdb_api_delete % self.qdb_secret, data={'permaid': arg[0]})
-				result = json.loads(result.content)
-				
-				if result['results']['success'] == 1:
-					return self.send_message("Hecho.")
-				else:
-					return self.send_message("No hecho. (qdb)")
-			except:
-				return self.send_message("Tu puta madre. " + result.content)
-		else:
-			return self.send_message("No autorizado.")
-	
+		try:
+			if result['results']['data']['ip'] == self.get_vip(user):
+				try:
+					result = requests.post(self.qdb_api_delete % self.qdb_secret, data={'permaid': arg[0]})
+					result = json.loads(result.content)
+					
+					if result['results']['success'] == 1:
+						return self.send_message("Hecho.")
+					else:
+						return self.send_message("No hecho. (qdb)")
+				except:
+					return self.send_message("Tu puta madre. " + result.content)
+			else:
+				return self.send_message("No autorizado.")
+		except:
+			return self.send_message("Ese ID no existe.")
+		
 	def search(self, msg, cmd, user, arg): 
 		response = Response()
 		try:
@@ -166,7 +169,8 @@ class QDB2(Module):
 			try:
 				r = json.loads(r.content)
 			except:
-				return self.send_message('wodim, arregla el qdb.')
+				#return self.send_message('wodim, arregla el qdb.')
+				raise
 			
 			self.quote_users[user] = []
 			return self.send_message(r['results']['url'] + " " + unicode(comment) + " (" + self.get_username(user) + ")")
@@ -188,17 +192,8 @@ class QDB2(Module):
 					send = True
 				else:
 					send = False
-				
-				try:
-					try:
-						newline = msg.decode("utf-8")
-					except:
-						newline = unicode(msg, "cp1252").encode("utf-8")
-					
-					self.quote_users[user].append(newline)
-				except:
+	
 					self.quote_users[user].append(msg)
-				
 				if send:
 					return self.send_raw_message("PRIVMSG " + self.get_username(user) + " :Escribe .send <comentario> cuando termines, .send_private <comentario> para enviar quote privado, o .cancel para cancelar.")
 				else:

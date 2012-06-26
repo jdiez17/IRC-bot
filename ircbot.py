@@ -169,7 +169,6 @@ class IRCBot(object):
 			module = self.modules[seq]
 			
 			if "parse" in dir(module):
-				response = module.parse(msg, cmd, user, arg)
 				try:
 					response = module.parse(msg, cmd, user, arg)
 				except:
