@@ -31,7 +31,7 @@ class Toalla(Module):
 			tollatweet = False
 			
 		if self.is_admin(nick):
-			return self.send_message("No.")
+			return self.ignore()
 
 		for toalla in toallas:
 			this_toalla = toalla.replace("\n", "")
@@ -53,6 +53,6 @@ class Toalla(Module):
 		self.last_toalla = time.time()
 		
 	def parse_custom(self, msg, cmd, user, arg):
-		if self.nick.lower() in cmd.lower():
+		if self.nick.lower() in cmd.lower() and user[:2] != "**":
 			return self.recursion_no_message(".toalla", user, [self.get_username(user)])
 	
