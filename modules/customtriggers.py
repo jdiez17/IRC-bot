@@ -43,5 +43,7 @@ class CustomTriggers(Module):
 			
 		for trigger in triggers:
 			if trigger in msg or trigger == cmd:
-				return self.send_message(self.r.get("ircbot_trigger_" + self._clean(trigger)))
+				answer = self.r.get("ircbot_trigger_" + self._clean(trigger))
+				answer = answer.replace("%user", self.get_username(user))
+				return self.send_message(answer)
 		
