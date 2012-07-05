@@ -84,8 +84,8 @@ class TwIRC(Module, tweepy.StreamListener):
 				#	return self.generate_response(
 				
 				return self.send_message(' '.join(arg) + " " + self.status_link % str(res.id))
-			except:
-				return self.send_message("Algo se ha roto, hamigos.")
+			except Exception, e:
+				return self.send_message(str(e))
 		else:
 			return self.send_message("espérate " + str(int(round(self.tweet_timeout - diff))) + " segundos, judío")
 		
