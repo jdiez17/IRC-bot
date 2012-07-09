@@ -1,5 +1,6 @@
 from module import Module
 import redis
+import re
 
 class CustomTriggers(Module):
 	def __init__(self):
@@ -9,6 +10,7 @@ class CustomTriggers(Module):
 		
 		self.add_command(".remember", self.add_trigger)
 		self.add_command(".forget", self.del_trigger)
+		self.add_command(".list_triggers", self.list_triggers)
 		
 	def _clean(self, str):
 		return str.replace(' ', '_')
@@ -35,14 +37,16 @@ class CustomTriggers(Module):
 	
 		return self.send_message(trigger + " trigger deleted.")
 		
-	def parse_custom(self, cmd, msg, user, arg):
+	def list_triggers(self, cmd, msg, user, arg):	
 		triggers = self.r.smembers("ircbot_triggers")
 		
-		if(len(arg) > 0):
-			msg = ' '.join(arg)
+		return self.send_message(', '.join(triggers))
+	
+	def parse_custom(self, msg, cmd, user, arg):
+		triggers = self.r.smembers("ircbot_triggers")
 			
 		for trigger in triggers:
-			if trigger in msg or trigger == cmd:
+			if trigger in msg:
 				answer = self.r.get("ircbot_trigger_" + self._clean(trigger))
 				answer = answer.replace("%user", self.get_username(user))
 				return self.send_message(answer)
