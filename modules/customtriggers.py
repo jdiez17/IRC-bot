@@ -18,6 +18,9 @@ class CustomTriggers(Module):
 	def add_trigger(self, cmd, msg, user, arg):
 		trigger, message = ' '.join(arg).split(' = ')
 		
+		if not trigger:
+			return self.ignore()
+		
 		try:
 			self.r.sadd("ircbot_triggers", trigger)
 			self.r.set("ircbot_trigger_" + self._clean(trigger), message)
@@ -27,6 +30,9 @@ class CustomTriggers(Module):
 		return self.send_message(trigger + " = " + message)
 	
 	def del_trigger(self, cmd, msg, user, arg):
+		if not self.is_admin(self.get_username(user)):
+			return self.ignore()
+			
 		trigger = ' '.join(arg)
 		
 		try:
