@@ -129,6 +129,9 @@ class Module(object):
 			
 		return user.split("!")[0]
 	
+	def is_privmsg(self, user):
+		return user[:2] == "**"
+	
 	def get_vip(self, user):
 		return user.split("@")[1]
 		

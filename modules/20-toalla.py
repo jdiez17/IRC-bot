@@ -53,6 +53,6 @@ class Toalla(Module):
 		self.last_toalla = time.time()
 		
 	def parse_custom(self, msg, cmd, user, arg):
-		if self.nick.lower() in cmd.lower() and user[:2] != "**":
+		if self.nick.lower() in cmd.lower() and not self.is_privmsg(user):
 			return self.recursion_no_message(".toalla", user, [self.get_username(user)])
 	
