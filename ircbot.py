@@ -65,6 +65,7 @@ class IRCBot(object):
 			self.s.send(cmd + "\n")
 		
 	def __send(self, msg, override = False, channel_snd = "placeholder"):
+		time.sleep(0.1)
 		if channel_snd == "placeholder":
 			channel_snd = self.home_channel
 		
@@ -167,7 +168,7 @@ class IRCBot(object):
 	def user_cmd(self, msg, cmd, user, arg):
 		for seq in self.modules:
 			module = self.modules[seq]
-			
+
 			if "parse" in dir(module):
 				try:
 					response = module.parse(msg, cmd, user, arg)
