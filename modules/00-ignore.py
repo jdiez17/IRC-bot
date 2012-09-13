@@ -23,8 +23,8 @@ class Ignore(Module):
 		if not self.is_admin(self.get_username(user)):
 			return self.ignore()
 			
-		self.r.srem("ircbot_ignored", arg[0])
-		return self.send_message(arg[0] + " unignored")
+#		self.r.srem("ircbot_ignored", arg[0])
+#		return self.send_message(arg[0] + " unignored")
 	
 	def list_ignored(self, cmd, msg, user, arg):
 		return self.send_message(", ".join(self.r.smembers("ircbot_ignored")))

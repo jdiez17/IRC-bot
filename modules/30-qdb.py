@@ -10,11 +10,11 @@ class QDB2(Module):
 	def __init__(self):
 		self.modname = "Fearnode QDB"
 		
-		self.qdb_api_post = "http://qdb.vortigaunt.net/api/send/%s"
-		self.qdb_login = "http://qdb.vortigaunt.net/login/%s"
-		self.qdb_api_read = "http://qdb.vortigaunt.net/api/read/%s"
-		self.qdb_api_search = "http://qdb.vortigaunt.net/api/search/%s"
-		self.qdb_api_delete = "http://qdb.vortigaunt.net/api/delete/%s"
+		self.qdb_api_post = "http://qdb.martinandrino.org/api/send/%s"
+		self.qdb_login = "http://qdb.martinandrino.org/login/%s"
+		self.qdb_api_read = "http://qdb.martinandrino.org/api/read/%s"
+		self.qdb_api_search = "http://qdb.martinandrino.org/api/search/%s"
+		self.qdb_api_delete = "http://qdb.martinandrino.org/api/delete/%s"
 		
 		self.qdb_secret = ""
 		self.qdb_password = ""
