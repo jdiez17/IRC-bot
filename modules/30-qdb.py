@@ -210,7 +210,7 @@ class QDB2(Module):
     def parse_raw(self, line):
         if "TOPIC " in line:
             user = line.split(":")[1].split("!")[0]
-            topic = line.split(":")[2]
+            topic = ':'.join(line.split(":")[:2])
 
             payload = {'nick': user, 'topic': topic}
             requests.post(self.qdb_api_topic % self.qdb_secret, data=payload)
