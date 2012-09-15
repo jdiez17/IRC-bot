@@ -11,14 +11,14 @@ class QDB2(Module):
         self.modname = "Fearnode QDB"
 
 
-        self.qdb_base = "http://qdb.martinandrino.org/api/" 
+        self.qdb_base = "http://qdb.martinandrino.org/" 
 
-        self.qdb_api_post = self.qdb_base + "send/%s"
+        self.qdb_api_post = self.qdb_base + "api/send/%s"
         self.qdb_login = self.qdb_base + "login/%s"
-        self.qdb_api_read = self.qdb_base + "read/%s"
-        self.qdb_api_search = self.qdb_base + "search/%s"
-        self.qdb_api_delete = self.qdb_base + "delete/%s"
-        self.qdb_api_topic = self.qdb_base + "topic/%s"
+        self.qdb_api_read = self.qdb_base + "api/read/%s"
+        self.qdb_api_search = self.qdb_base + "api/search/%s"
+        self.qdb_api_delete = self.qdb_base + "api/delete/%s"
+        self.qdb_api_topic = self.qdb_base + "api/topic/%s"
 
         self.qdb_secret = ""
         self.qdb_password = ""
@@ -210,7 +210,7 @@ class QDB2(Module):
     def parse_raw(self, line):
         if "TOPIC " in line:
             user = line.split(":")[1].split("!")[0]
-            topic = ':'.join(line.split(":")[:2])
+            topic = ':'.join(line.split(":")[2:])
 
             payload = {'nick': user, 'topic': topic}
             requests.post(self.qdb_api_topic % self.qdb_secret, data=payload)
