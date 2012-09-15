@@ -9,12 +9,16 @@ from datetime import date
 class QDB2(Module):
 	def __init__(self):
 		self.modname = "Fearnode QDB"
-		
-		self.qdb_api_post = "http://qdb.martinandrino.org/api/send/%s"
-		self.qdb_login = "http://qdb.martinandrino.org/login/%s"
-		self.qdb_api_read = "http://qdb.martinandrino.org/api/read/%s"
-		self.qdb_api_search = "http://qdb.martinandrino.org/api/search/%s"
-		self.qdb_api_delete = "http://qdb.martinandrino.org/api/delete/%s"
+
+
+		self.qdb_base = "http://qdb.martinandrino.org/api/" 
+
+		self.qdb_api_post = self.qdb_base + "send/%s"
+		self.qdb_login = self.qdb_base + "login/%s"
+		self.qdb_api_read = self.qdb_base + "read/%s"
+		self.qdb_api_search = self.qdb_base + "search/%s"
+		self.qdb_api_delete = self.qdb_base + "delete/%s"
+        self.qdb_api_topic = self.qdb_base + "topic/%s"
 		
 		self.qdb_secret = ""
 		self.qdb_password = ""
@@ -202,3 +206,11 @@ class QDB2(Module):
 			else:
 				self.quote_users[user] = [msg]
 				return self.send_raw_message("PRIVMSG " + self.get_username(user) + " :Escribe .send <comentario> cuando termines, .send_private <comentario> para enviar quote privado, o .cancel para cancelar.")
+
+    def parse_raw(self, line):
+        if "TOPIC " in line:
+            user = line.split(":")[1].split("!")[0]
+            topic = line.split(":")[2]
+
+            payload = {'nick': user, 'topic': topic}
+            requests.post(self.qdb_api_topic % self.qdb_secret, data=payload)
