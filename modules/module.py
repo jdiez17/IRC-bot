@@ -108,7 +108,7 @@ class Module(object):
         if user[:2] == "**":
             user = user[2:]
         for admin in self.admins:
-            if admin in user and user != self.nick:
+            if admin == self.get_username(user) and user != self.nick:
                 return True
                 
         return False

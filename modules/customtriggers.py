@@ -1,6 +1,7 @@
 from module import Module
 import redis
 import re
+from decorators import admincommand
 
 class CustomTriggers(Module):
     def __init__(self):
@@ -28,11 +29,9 @@ class CustomTriggers(Module):
             return self.send_message(str(e))
         
         return self.send_message(trigger + " = " + message)
-    
+   
+    @admincommand 
     def del_trigger(self, cmd, msg, user, arg):
-        if not self.is_admin(self.get_username(user)):
-            return self.ignore()
-            
         trigger = ' '.join(arg)
         
         try:

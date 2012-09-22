@@ -1,6 +1,7 @@
 from module import Module
 import sys
 from subprocess import Popen, PIPE
+from decorators import admincommand
 
 class AdminCommands(Module):
     def __init__(self):
@@ -12,6 +13,7 @@ class AdminCommands(Module):
         self.add_command(".unlock", self.unlock)
         self.add_command(".gitupdate", self.gitupdate)
         self.add_command(".parrot", self.parrot)
+        self.add_command(".join", self.join)
         
     def parse_raw(self, line):
         if "ERROR :Closing Link:" in line:
@@ -23,20 +25,18 @@ class AdminCommands(Module):
         else:
             return self.ignore()
     
+    
+    @admincommand
     def rehash(self, msg, cmd, user, arg):
-        if not self.is_admin(user):
-            return self.ignore()
-        return self.reconnect()
-    
+       return self.reconnect()
+
+    @admincommand    
     def lock(self, msg, cmd, user, arg):
-        if not self.is_admin(user):
-            return self.ignore()
-        return self.acquire_lock()
-    
+       return self.acquire_lock()
+
+    @admincommand    
     def unlock(self, msg, cmd, user, arg):
-        if not self.is_admin(user):
-            return self.ignore()
-        return self.release_lock()
+       return self.release_lock()
     
     def gitupdate(self, msg, cmd, user, arg):
         proc = Popen(['git', 'pull'], stdout=PIPE, stderr=PIPE)
@@ -47,10 +47,13 @@ class AdminCommands(Module):
                 return self.send_message("No updates found.")
                 
             return self.send_message("Updated.")
-    
+
+    @admincommand
+    def join(self, msg, cmd, user, arg):
+        return self.send_raw_message("JOIN " + arg[0])
+ 
+    @admincommand   
     def parrot(self, msg, cmd, user, arg):
-        if not self.is_admin(user):
-            return self.ignore()
         msg = msg.replace(cmd + " ", "")
         return self.send_message(msg)
         
