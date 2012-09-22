@@ -18,7 +18,8 @@ class AdminCommands(Module):
             return self.reconnect()
             
         if "INVITE " + self.nick in line:
-            return self.send_raw_message("JOIN " + self.config.get('core', 'home_channel'))
+            channel = line.split(":")[2]
+            return self.send_raw_message("JOIN " + channel)
         else:
             return self.ignore()
     

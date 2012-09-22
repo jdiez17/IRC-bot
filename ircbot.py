@@ -3,9 +3,9 @@ import os, socket, sys, time, inspect, logging, logging.handlers
 
 class IRCBot(object):
     def __init__(self):
-        self.nick = ""
-        self.password = ""
-        self.home_channel = ""
+        self.nick = None 
+        self.password = None 
+        self.home_channel = None 
         
         self.s = None
         self.tmp_modules = []
@@ -15,10 +15,11 @@ class IRCBot(object):
         self.logger = None
         
         self.admins = []
-        self.transport = ""
 
         self.locked = False
         self.lock_ended = False
+
+        self.current_channel = None 
         
     def log(self, line):
         try:
@@ -67,6 +68,9 @@ class IRCBot(object):
     def __send(self, msg, override = False, channel_snd = "placeholder"):
         time.sleep(0.1)
         if channel_snd == "placeholder":
+            channel_snd = self.current_channel
+
+        if channel_snd[:1] != "#":
             channel_snd = self.home_channel
         
         self.__send_raw("PRIVMSG " + channel_snd + " :" + msg)
@@ -131,13 +135,16 @@ class IRCBot(object):
                     except:
                         return
                     cmd = msg.split(" ")[0]
-                    #user = line.split(":")[1].split("!")[0]
                     user = line.split(":")[1].split(" ")[0]
                     arg = msg.split(" ")[1:]
+                    channel = line.split(" ")[2]
+
+                    self.current_channel = channel
                 
                     if "PRIVMSG " + self.nick in line:
+                        self.current_channel = user.split("!")[0]
                         user = "**" + user # **user denotes private message.
-                
+             
                     self.user_cmd(msg, cmd, user, arg)
                 except:
                     raise
