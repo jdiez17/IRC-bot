@@ -11,7 +11,7 @@ class QDB2(Module):
         self.modname = "Fearnode QDB"
 
 
-        self.qdb_base = "http://qdb.martinandrino.org/" 
+        self.qdb_base = "http://qdb.fearnode.net/" 
 
         self.qdb_api_post = self.qdb_base + "api/send/%s"
         self.qdb_login = self.qdb_base + "login/%s"
@@ -114,7 +114,7 @@ class QDB2(Module):
                         return self.send_message("Quote is deleted.")
                     else:
                         quote = result['results']['data']['text'].split("\n")
-                        response.add_action(self.send_message('Enviado por ' + result['results']['data']['nick'] + ' (' + result['results']['data']['ip'] + '):'))
+                        response.add_action(self.send_message('Enviado por ' + result['results']['data']['nick'] + ' (' + result['results']['data']['date'] + '):'))
                         
                         for line in quote:
                             if "\r" in line or "\n" in line:    
