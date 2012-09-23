@@ -177,8 +177,8 @@ class QDB2(Module):
                 raise
             
             self.quote_users[user] = []
-            return self.send_message(r['results']['url'] + " " + unicode(comment) + " (" + self.get_username(user) + ")")
-            
+            return self.generate_response()
+             
     def cancel(self, msg, cmd, user, arg):
         if user[:2] == "**":
             user = user[2:]
