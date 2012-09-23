@@ -92,7 +92,14 @@ class IRCBot(object):
 
         if channel_snd[:1] != "#":
             channel_snd = self.home_channel
-        
+       
+        prohibited = {"\n": "", "\r": ""}
+	for k, v in prohibited.items():
+		try:
+			msg = msg.replace(k, v)
+		except Exception, e:
+			return str(e)
+ 
         self.__send_raw("PRIVMSG " + channel_snd + " :" + msg)
         
     def send(self, msg, channel_snd="placeholder"):
