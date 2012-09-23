@@ -1,5 +1,21 @@
 # -*- coding: utf-8 -*-
 import os, socket, sys, time, inspect, logging, logging.handlers
+import threading
+import redis
+import json
+
+def data_receiver(ircbot):
+    r = redis.Redis()
+    sub = r.pubsub()
+    sub.subscribe('ircbot_pubsub')
+
+    while True:
+        for m in sub.listen():
+            try:
+                data = json.loads(m['data'])
+                ircbot.send(data['message'], channel_snd=data['channel'])
+            except Exception, e:
+                pass
 
 class IRCBot(object):
     def __init__(self):
@@ -54,6 +70,10 @@ class IRCBot(object):
         for seqno in self.modules:
             print "- " + self.modules[seqno].modname + " (" + str(seqno) + ")"
         
+        t = threading.Thread(target=data_receiver, args=(self,))
+        t.setDaemon(True)
+        t.start()
+
         time.sleep(2)
         self.main_loop()
         sys.exit() # should never be reached
@@ -75,8 +95,8 @@ class IRCBot(object):
         
         self.__send_raw("PRIVMSG " + channel_snd + " :" + msg)
         
-    def send(self, msg):
-        return self.__send(msg)
+    def send(self, msg, channel_snd="placeholder"):
+        return self.__send(msg, channel_snd=channel_snd)
     
     def __parse_response(self, response, module, bypass_lock = False):              
         self.log_info("III " + str(response))
