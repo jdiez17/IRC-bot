@@ -17,7 +17,7 @@ class TwIRC(Module, tweepy.StreamListener):
         self.commands = dict()
         self.add_command(".tweet", self.tweet)
         
-        self.twitter_user = "fearn0de"
+        self.twitter_user = "F34RN0D3"
         self.status_link = "http://twitter.com/" + self.twitter_user + "/status/%s"
         
         self.twitter_connect()
